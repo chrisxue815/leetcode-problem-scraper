@@ -24,22 +24,22 @@ async function run() {
     let all = await res.json();
     await fs.promises.writeFile(allJsonPath, JSON.stringify(all, null, 4));
 
-    let template = await fs.promises.readFile('res/question-request-template.json');
+    let template = await fs.promises.readFile('res/problem-request-template.json');
     template = JSON.parse(template);
 
-    for (let question of all.stat_status_pairs) {
-        if (question.paid_only) {
+    for (let problem of all.stat_status_pairs) {
+        if (problem.paid_only) {
             continue;
         }
 
-        let id = question.stat.frontend_question_id;
-        let outputPath = `build/questions/${id}.json`;
+        let id = problem.stat.frontend_question_id;
+        let outputPath = `build/problems/${id}.json`;
 
         if (await fsExists(outputPath)) {
             continue;
         }
 
-        let name = question.stat.question__title_slug;
+        let name = problem.stat.question__title_slug;
         let headers = template.headers;
         let body = template.body.replace('{0}', name);
         headers['Content-Length'] = body.length;
@@ -51,8 +51,8 @@ async function run() {
         };
 
         let res = await fetch('https://leetcode.com/graphql', init);
-        let questionData = await res.json();
-        await fs.promises.writeFile(outputPath, JSON.stringify(questionData, null, 4));
+        let problemData = await res.json();
+        await fs.promises.writeFile(outputPath, JSON.stringify(problemData, null, 4));
 
         await sleep(2000);
     }
