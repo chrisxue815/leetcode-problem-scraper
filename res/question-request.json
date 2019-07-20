@@ -1,0 +1,19 @@
+{
+    "headers": {
+        "Host": "leetcode.com",
+        "Connection": "keep-alive",
+        "Content-Length": "994",
+        "Pragma": "no-cache",
+        "Cache-Control": "no-cache",
+        "accept": "*/*",
+        "X-NewRelic-ID": "UAQDVFVRGwEAXVlbBAg=",
+        "Origin": "https://leetcode.com",
+        "x-csrftoken": "hgWyoPymmVez8AlgUCXEzz8q5Fmo9LmdISduwgali9OjoCcaAddgVDaFOJjDtvyM",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36",
+        "content-type": "application/json",
+        "Referer": "https://leetcode.com/problems/integer-to-roman/",
+        "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7,zh-TW;q=0.6",
+        "Cookie": "__cfduid=df59ecb3a7c238f3bdba7b0114a127dda1563570826; _ga=GA1.2.1401645395.1563570827; _gid=GA1.2.912936470.1563570827; csrftoken=hgWyoPymmVez8AlgUCXEzz8q5Fmo9LmdISduwgali9OjoCcaAddgVDaFOJjDtvyM; _gat=1"
+    },
+    "body": "{\"operationName\":\"questionData\",\"variables\":{\"titleSlug\":\"{0}\"},\"query\":\"query questionData($titleSlug: String!) {\\n  question(titleSlug: $titleSlug) {\\n    questionId\\n    questionFrontendId\\n    boundTopicId\\n    title\\n    titleSlug\\n    content\\n    translatedTitle\\n    translatedContent\\n    isPaidOnly\\n    difficulty\\n    likes\\n    dislikes\\n    isLiked\\n    similarQuestions\\n    contributors {\\n      username\\n      profileUrl\\n      avatarUrl\\n      __typename\\n    }\\n    langToValidPlayground\\n    topicTags {\\n      name\\n      slug\\n      translatedName\\n      __typename\\n    }\\n    companyTagStats\\n    codeSnippets {\\n      lang\\n      langSlug\\n      code\\n      __typename\\n    }\\n    stats\\n    hints\\n    solution {\\n      id\\n      canSeeDetail\\n      __typename\\n    }\\n    status\\n    sampleTestCase\\n    metaData\\n    judgerAvailable\\n    judgeType\\n    mysqlSchemas\\n    enableRunCode\\n    enableTestMode\\n    envInfo\\n    libraryUrl\\n    __typename\\n  }\\n}\\n\"}"
+}
