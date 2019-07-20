@@ -1,81 +1,61 @@
 const fs = require('fs');
-const https = require('https');
+const fetch = require('node-fetch');
 
 const allJsonPath = 'build/all.json';
 
-class Scraper {
-    async main() {
-        let f = fs.createWriteStream(allJsonPath);
-
-        let req = https.request('https://leetcode.com/api/problems/all/', res => {
-            res.pipe(f);
-            res.on('end', () => this.fetchAllQuestions());
-        });
-
-        req.end();
-    }
-
-    async fetchAllQuestions() {
-        let all = await fs.promises.readFile(allJsonPath);
-        this.all = JSON.parse(all);
-
-        let questionRequest = await fs.promises.readFile('res/question-request.json');
-        this.questionRequest = JSON.parse(questionRequest);
-
-        this.index = -1;
-
-        await this.fetchQuestion();
-    }
-
-    async fetchQuestion() {
-        this.index++;
-
-        if (this.index >= this.all.stat_status_pairs.length) {
-            return;
+async function fsExists(path) {
+    try {
+        await fs.promises.stat(path);
+        return true;
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            return false;
         }
-
-        let {question, outputPath} = await this.findNextQuestion();
-        let slug = question.stat.question__title_slug;
-
-        let headers = this.questionRequest.headers;
-        let body = this.questionRequest.body.replace('{0}', slug);
-        headers['Content-Length'] = body.length;
-
-        let options = {
-            method: 'POST',
-            headers: this.questionRequest.headers,
-        };
-
-        let f = fs.createWriteStream(outputPath);
-
-        let req = https.request('https://leetcode.com/graphql', options, res => {
-            res.pipe(f);
-            res.on('end', () => setTimeout(() => this.fetchQuestion(), 2000));
-            res.on('error', err => console.error(err));
-        });
-
-        req.end(body);
-    }
-
-    async findNextQuestion() {
-        for (; ; this.index++) {
-            let question = this.all.stat_status_pairs[this.index];
-            if (question.paid_only) {
-                continue;
-            }
-
-            let id = question.stat.frontend_question_id;
-            let outputPath = `build/questions/${id}.json`;
-
-            try {
-                await fs.promises.stat(outputPath);
-            } catch (err) {
-                if (err.code === 'ENOENT') {
-                    return {question, outputPath};
-                }
-            }
-        }
+        throw err;
     }
 }
 
-new Scraper().main();
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function run() {
+    let res = await fetch('https://leetcode.com/api/problems/all/');
+    let all = await res.json();
+    await fs.promises.writeFile(allJsonPath, JSON.stringify(all, null, 4));
+
+    let template = await fs.promises.readFile('res/question-request-template.json');
+    template = JSON.parse(template);
+
+    for (let question of all.stat_status_pairs) {
+        if (question.paid_only) {
+            continue;
+        }
+
+        let id = question.stat.frontend_question_id;
+        let outputPath = `build/questions/${id}.json`;
+
+        if (await fsExists(outputPath)) {
+            continue;
+        }
+
+        let name = question.stat.question__title_slug;
+        let headers = template.headers;
+        let body = template.body.replace('{0}', name);
+        headers['Content-Length'] = body.length;
+
+        let init = {
+            method: 'POST',
+            headers: headers,
+            body: body,
+        };
+
+        let res = await fetch('https://leetcode.com/graphql', init);
+        let questionData = await res.json();
+        await fs.promises.writeFile(outputPath, JSON.stringify(questionData, null, 4));
+
+        await sleep(2000);
+    }
+}
+
+run();
